@@ -16,78 +16,68 @@
 import pyautogui as pag
 from time import sleep as t
 
-Agents = ["astra", "breach", "brimstone", "chamber", "cypher", "deadlock"
+Agents = ["astra", "breach", "brimstone", "chamber", "cypher", "deadlock",
           "fade", "gekko", "harbor", "iso", "jett", "kayo", "killjoy",
           "neon", "omen", "phoenix", "raze", "reyna", "sage",
           "skye", "sova", "viper", "yoru"]
 
-#---agents input
-agents = pag.prompt(text="available agents : \n"
-                         "astra\n"
-                         "breach , brimstone\n"
-                         "chamber, cypher\n"
-                         "deadlock(WIP)\n"
-                         "fade\n"
-                         "gekko\n"
-                         "harbor\n"
-                         "iso\n"
-                         "jett\n"
-                         "kayo , killjoy\n"
-                         "neon\n"
-                         "omen\n"
-                         "phoenix\n"
-                         "raze , reyna\n"
-                         "sage , skye , sova\n"
-                         "viper\n"
-                         "yoru",title="select your agent : ")
 
-print("---:REBOOT SYSTEM:---")
-print("---:.PLEASE WAIT.:---")
-print("▒▒▒▒▒▒▒▒▒▒ 0%")
-t(0.1)
-print("█▒▒▒▒▒▒▒▒▒ 10%")
-t(0.1)
-print("██▒▒▒▒▒▒▒▒ 20%")
-t(0.1)
-print("███▒▒▒▒▒▒▒ 30%")
-t(0.1)
-print("████▒▒▒▒▒▒ 40%")
-t(0.1)
-print("█████▒▒▒▒▒ 50%")
-t(0.1)
-print("██████▒▒▒▒ 60%")
-t(0.1)
-print("███████▒▒▒ 70%")
-t(0.1)
-print("████████▒▒ 80%")
-t(0.1)
-print("█████████▒ 90%")
-t(0.1)
-print("██████████ 100%")
-print("---:!SYSTEM READY!:---")
-print("---:!!!STAND BY!!!:---")
+def select_mode():
+    mode = pag.prompt(text="1 : Auto Lock\n2: Check list", title="Select mode")
+    return mode
 
-if agents in Agents:
-    for i in range(99999):
-        if pag.locateOnScreen(agents + ".png", confidence = 0.8):
-            print("-:.Instant locking.:-")
-            # locate agents pic
-            x = pag.locateCenterOnScreen(agents + ".png", confidence = 0.8)[0]
-            y = pag.locateCenterOnScreen(agents + ".png", confidence = 0.8)[1]
-            # locate lock in button
-            xx = pag.locateCenterOnScreen("lock.png", confidence = 0.8)[0]
-            yy = pag.locateCenterOnScreen("lock.png", confidence=0.8)[1]
-            # go to agents pic
-            pag.moveTo(x,y)
-            pag.tripleClick(x,y)
-            # go to lock in button
-            pag.moveTo(xx,yy)
-            pag.tripleClick(xx,yy)
-            #Result
-            print("-:.Operation Completed.:-")
-            print(agents + " image cords : X : " + str(x) + " Y : " + str(y))
-            print("lock button cords : X : " + str(xx) + " Y : " + str(yy))
-            break
-        else: print("Error 404 :" ,agents, "image not found.")
-else:
-    print("Error 303 : Agent :" ,agents, "is not available.")
+
+def auto_lock():
+    agents = pag.prompt(text="Available agents:\n" + "\n".join(Agents), title="Select your agent:")
+
+    print("---:REBOOT SYSTEM:---")
+    print("---:.PLEASE WAIT.:---")
+    for i in range(11):
+        progress = i * 10
+        print(f"\r{'█' * i}{'▒' * (10 - i)} {progress}% ", end="")
+        t(0.1)
+    print("\n---:!SYSTEM READY!:---")
+    print("---:!!!STAND BY!!!:---")
+
+    if agents.lower() in [agent.lower() for agent in Agents]:
+        for _ in range(99999):
+            if pag.locateOnScreen(agents.lower() + ".png", confidence=0.8):
+                print("-:.Instant locking.:-")
+                x, y = pag.locateCenterOnScreen(agents.lower() + ".png", confidence=0.8)
+                xx, yy = pag.locateCenterOnScreen("lock.png", confidence=0.8)
+                pag.moveTo(x, y)
+                pag.tripleClick(x, y)
+                pag.moveTo(xx, yy)
+                pag.tripleClick(xx, yy)
+                print("-:.Operation Completed.:-")
+                print(f"{agents} image cords : X : {x} Y : {y}")
+                print(f"Lock button cords : X : {xx} Y : {yy}")
+                break
+            else:
+                print(f"Error 404: {agents} image not found.")
+    else:
+        print(f"Error 303: Agent '{agents}' is not available.")
+
+
+def main():
+    mode = select_mode()
+    if mode == "1":
+        auto_lock()
+    elif mode == "2":
+        check = pag.prompt(text="Check agents available", title="Checking agents...")
+        if check.lower() in [agent.lower() for agent in Agents]:
+            print(f"{check} is available :D")
+            lock = pag.prompt(text=f"{check} is available :D\nWould you like to lock?\ny/n",
+                              title="Agent Available!")
+            if lock.lower() == "y":
+                auto_lock()
+            else:
+                print("Nope")
+                main()
+        else:
+            print(f"{check} : is not currently available :(")
+            main()
+
+
+if __name__ == "__main__":
+    main()
